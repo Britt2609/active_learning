@@ -53,7 +53,9 @@ def split_features_and_labels(df, labels, sample_size=50000):
     X_neg = data_sample[data_sample["Label"] == "Benign"]
     y_pos = X_pos["Label"]
 
-    data_sample["Label"][data_sample["Label"] == 'Benign'] = 0
+    # data_sample["Label"][data_sample["Label"] == 'Benign' | data_sample["Label"] == 'Web Attack - Brute Force'] = 0
+    data_sample['Label'].replace({'Web Attack - Brute Force': 0, 'Benign': 0}, inplace=True)
+
     data_sample = data_sample.replace(list_labels, 1)
 
     X = data_sample[features]

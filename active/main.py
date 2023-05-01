@@ -3,6 +3,7 @@ from active.clustering import *
 from active.classifiers import *
 from active.active_learning import *
 import numpy as np
+from sklearn.metrics import f1_score
 from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import euclidean_distances
 
@@ -10,7 +11,7 @@ from sklearn.metrics.pairwise import euclidean_distances
 df, labels = get_labels()
 
 # X, y = split_features_and_labels(df, labels, sample_size=2119180)
-X, y, y_all_labels, X_pos, y_pos, X_neg = split_features_and_labels(df, labels, sample_size=5000)
+X, y, y_all_labels, X_pos, y_pos, X_neg = split_features_and_labels(df, labels, sample_size=50000)
 
 
 ## For clustering:
@@ -31,7 +32,14 @@ data_full_encoded = X_encoded.join(y)
 
 # plot_classifier_results(y_test, y_pred)
 
+X_train, X_test, y_train, y_test = train_test_split(X_encoded, y, test_size=0.9, random_state=42)
+print("splitted")
 
-clf, X_labeled, y_labeled, X_unlabeled = active_learning_classification(X_encoded, y, unlabeled_fraction=0.5, random_state=42)
+clf, X_labeled, y_labeled, X_unlabeled = active_learning_classification(X_train, y_train, unlabeled_fraction=0.5, random_state=42, eps=0.5, min_samples=5, al_method="automatic")
+print("trained")
 # active_learning_dbscan(X_pos, X_neg, eps=0.5, min_samples=5)
 # clustering_and_AL(data_full_encoded)
+y_pred = clf.predict(X_test)
+print("predicted")
+f1 = f1_score(y_test, y_pred)
+print(f1)
