@@ -53,15 +53,33 @@ def split_features_and_labels(df, labels, sample_size=50000):
     X_neg = data_sample[data_sample["Label"] == "Benign"]
     y_pos = X_pos["Label"]
 
-    # data_sample["Label"][data_sample["Label"] == 'Benign' | data_sample["Label"] == 'Web Attack - Brute Force'] = 0
-    data_sample['Label'].replace({'Web Attack - Brute Force': 0, 'Benign': 0}, inplace=True)
+    data_copy = data_sample.copy()
 
-    data_sample = data_sample.replace(list_labels, 1)
+    # data_sample["Label"][data_sample["Label"] == 'Benign' | data_sample["Label"] == 'Web Attack - Brute Force'] = 0
+    data_copy['Label'].replace({'Web Attack - Brute Force': 0, 'Benign': 0}, inplace=True)
+    data_sample['Label'].replace({'Benign': 0}, inplace=True)
+
+    data_copy = data_copy.replace(list_labels, 1)
+    data_sample = data_copy.replace(list_labels, 1)
+
+    # Select 20% of the positive data to be put to value 0.
+    mask = data_copy['Label'] == 1
+    n_rows = int(len(data_copy[mask]) * 0.2)
+    selected_rows = data_copy[mask].sample(n=n_rows, replace=False)
+
+    # Modify the selected rows
+    data_copy.loc[selected_rows.index, 'Label'] = 0
+
+    X_one_replaced = data_copy[features]
+    y_one_replaced = data_copy["Label"]
 
     X = data_sample[features]
     y = data_sample["Label"]
 
-    return X, y, y_all_labels, X_pos, y_pos, X_neg
+    print("amount of differences: ")
+    print(len(data_sample["Label"].compare(data_copy["Label"])))
+
+    return X, y, y_all_labels, X_pos, y_pos, X_neg, X_one_replaced, y_one_replaced
 
 
 def encode_features(X):

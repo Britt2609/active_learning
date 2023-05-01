@@ -7,12 +7,10 @@ from sklearn.metrics import f1_score
 from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import euclidean_distances
 
-
 df, labels = get_labels()
 
 # X, y = split_features_and_labels(df, labels, sample_size=2119180)
-X, y, y_all_labels, X_pos, y_pos, X_neg = split_features_and_labels(df, labels, sample_size=50000)
-
+X, y, y_all_labels, X_pos, y_pos, X_neg, X_one_replaced, y_one_replaced = split_features_and_labels(df, labels, sample_size=500000)
 
 ## For clustering:
 # get_cluster(X_encoded, y_all_labels)

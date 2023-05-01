@@ -19,7 +19,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_iris
 
 
-def active_learning_classification(X, y, unlabeled_fraction=0.5, random_state=42, eps=0.5, min_samples=5, al_method = "by_hand"):
+def active_learning_classification(X, y, unlabeled_fraction=0.9, random_state=42, eps=0.5, min_samples=5, al_method = "by_hand"):
     """
     Active learning algorithm that iteratively selects the most informative examples to be labeled,
     and trains a classifier on the new labeled data, until all examples are labeled or a maximum number
@@ -62,7 +62,7 @@ def active_learning_classification(X, y, unlabeled_fraction=0.5, random_state=42
     # print(X_unlabeled)
     # Initialize the classifier and the maximum number of iterations
     clf = SVC(kernel='linear', random_state=random_state)
-    max_iterations = 10
+    max_iterations = 5
     iteration = 0
 
     # dbscan = IncrementalDBSCAN(eps=0.5, min_pts=5)
@@ -104,22 +104,23 @@ def active_learning_classification(X, y, unlabeled_fraction=0.5, random_state=42
                 # Add the confirmed label to the labeled set, remove from unlabeled set, update model
                 X_labeled, y_labeled, X_unlabeled = update_labels(X_unlabeled, X_labeled, X_new,  y_labeled, x, y_new[i])
         else:
-            y_new = pd.Series(np.zeros(X_new.shape[0], dtype=int))
+            y_new_data = pd.Series(np.zeros(X_new.shape[0], dtype=int))
             for i, x in enumerate(X_new.values):
-                print(y_new.index[i])
-                y_new[i] = y_unlabeled[y_new.index[i]]
+                y_new_data[i] = y_unlabeled[X_new.index[i]]
+
+            y_new = pd.DataFrame(y_new_data, index=X_new.index)
+            # y_new = [y_unlabeled[i] for i in X_new.index]
+
             # Add the newly labeled examples to the labeled set
             # y_new =
-            # X_labeled = pd.concat([X_labeled, X_new])
-            # y_labeled = pd.concat([y_labeled, y_new])
-
-
+            X_labeled = pd.concat([X_labeled, X_new])
+            y_labeled = pd.concat([y_labeled, y_new])
 
         # Remove the newly labeled examples from the unlabeled set
         # mask = ~(X_unlabeled.isin(X_new)).all(axis=1)
         # X_unlabeled = X_unlabeled[mask]
-
         iteration += 1
+        print("iteration " + str(iteration) + " done")
 
     # Train the final classifier on all labeled data
     clf.fit(X_labeled, y_labeled)
