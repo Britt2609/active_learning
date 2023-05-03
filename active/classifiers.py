@@ -9,7 +9,7 @@ import imageio as io
 import os
 import datetime
 from sklearn import metrics
-from active.clustering import *
+from clustering import *
 from sklearn.metrics import accuracy_score
 from sklearn.datasets import load_iris
 
