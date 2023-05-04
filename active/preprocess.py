@@ -10,7 +10,7 @@ import os
 import datetime
 from sklearn import metrics
 
-MAIN_PATH = "C:/Users/Gebruiker/PycharmProjects/active_learning_zeek/Etiennes_data"
+MAIN_PATH = "/content/active_learning/Etiennes_data"
 
 
 def get_labels():
